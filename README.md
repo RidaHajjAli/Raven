@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ChatGPT Link Processor
 
 A production-grade asynchronous system that generates, validates, and processes ChatGPT share links to extract conversations and insights using FastAPI and LLMs.
@@ -154,7 +153,3 @@ For production deployment:
 ## License
 
 MIT License - see LICENSE file for details
-=======
-# Raven
-Generate, Validate, and Get Insights from Public Shared ChatGPT Conversations
->>>>>>> 24853aed696afd09b76fd97d074b9065fe057a5d
