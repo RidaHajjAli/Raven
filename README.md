@@ -80,7 +80,10 @@ curl http://127.0.0.1:8001/insights
 # Stop processing
 curl -X POST http://127.0.0.1:8001/stop
 ```
-
+You can test one specific url you input it
+```bash
+python -m tests.test_url
+```
 ## Architecture
 
 ```
