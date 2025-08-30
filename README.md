@@ -1,4 +1,4 @@
-# ChatGPT Link Processor
+# Raven
 
 A production-grade asynchronous system that generates, validates, and processes ChatGPT share links to extract conversations and insights using FastAPI and LLMs.
 
@@ -136,6 +136,20 @@ Environment variables (optional):
 }
 ```
 
+## Efficiency
+
+While this system is designed to extract information from public ChatGPT share links, it’s important to recognize its limitations when applied at scale:
+
+- **Brute-force discovery is infeasible.** The probability of randomly guessing a valid share link is astronomically low.  
+- **High entropy ensures security.** Share links use UUIDs, which provide `2^128 ≈ 3.4 × 10^38` possible combinations.  
+- **Tiny fraction of valid links.** Even if OpenAI hosted **1 trillion (10¹²) shared links**, the proportion of valid links would be:
+
+  `10^12 / (3.4 × 10^38) ≈ 3 × 10^-27`
+
+  Which is effectively **zero**.
+
+
+
 ## Production Deployment
 
 For production deployment:
@@ -152,6 +166,11 @@ For production deployment:
 - **Extraction Failures**: Verify ChatGPT share links are accessible
 - **Performance**: Adjust rate limiting and concurrent processing limits
 - **Logs**: Check `app.log` for detailed error information
+
+## Future Enhancements
+
+- **User Interface**: A web-based user interface for manual data entry and visualization
+- **More LLM Models**: Support for additional LLM models (Claude, gemini, Qwen, etc..)
 
 ## License
 
