@@ -174,4 +174,4 @@ For production deployment:
 
 ## License
 
-MIT License - see [`LICENSE`](./LICENSE) file for details
+Hippocratic License - see [`LICENSE`](./LICENSE) file for details
