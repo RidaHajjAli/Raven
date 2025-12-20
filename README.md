@@ -1,6 +1,14 @@
-# Raven
+<div align="center">
+  <div style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
+    <div style="flex: 1;">
+      <h1>Raven</h1>
+      <p>A production-grade asynchronous system that generates, validates, and processes ChatGPT share links to extract conversations and insights using FastAPI and LLMs.</p>
+    </div>
+    <img src="assets/raven_logo.png" width="260" height="200" style="margin-left: 20px;" alt="Raven Logo">
+  </div>
+</div>
 
-A production-grade asynchronous system that generates, validates, and processes ChatGPT share links to extract conversations and insights using FastAPI and LLMs.
+
 
 ## Features
 
