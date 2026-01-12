@@ -9,26 +9,30 @@ logger = logging.getLogger(__name__)
 class LinkGenerator:
     """Generates and validates ChatGPT share links using UUID only"""
     
-    def generate_links(self, count: int = 5) -> List[str]:
-        """Generate ChatGPT share URLs using UUID4
+    def generate_links(self, count: int = 5, platform: str = "chatgpt") -> List[str]:
+        """Generate share URLs using UUID4
         
         Args:
             count: Number of links to generate
+            platform: Platform to generate links for ("chatgpt" or "gemini")
             
         Returns:
-            List of generated ChatGPT share URLs
+            List of generated share URLs
         """
-        logger.info(f"Generating {count} new links using UUID4...")
+        logger.info(f"Generating {count} new {platform} links using UUID4...")
         
         links = []
         for _ in range(count):
             # Generate UUID4 which follows the format: 8-4-4-4-12 hexadecimal characters
             uuid_str = str(uuid.uuid4())
-            link = f"https://chatgpt.com/share/{uuid_str}"
+            if platform.lower() == "gemini":
+                # Gemini IDs are often shorter, but UUID works for synthetic generation
+                link = f"https://gemini.google.com/share/{uuid_str[:12]}"
+            else:
+                link = f"https://chatgpt.com/share/{uuid_str}"
             links.append(link)
         
-        logger.info(f"Generated {len(links)} URLs successfully")
-        #logger.info(f"Generated {links[:3]}...{links[-3:]} URLs successfully")
+        logger.info(f"Generated {len(links)} {platform} URLs successfully")
         return links
     
     async def validate_link(self, session: aiohttp.ClientSession, url: str) -> bool:

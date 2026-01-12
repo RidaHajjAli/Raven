@@ -90,13 +90,24 @@ class ContentExtractor:
     
     async def _extract_with_multiple_strategies(self, page) -> List[Dict]:
         """Try multiple extraction strategies with improved role detection"""
-        strategies = [
-            self._strategy_modern_selectors,
-            self._strategy_alternative_selectors,
-            self._strategy_generic_selectors,
-            self._strategy_structured_extraction,
-            self._strategy_fallback
-        ]
+        url = page.url
+        strategies = []
+        
+        if "gemini.google.com" in url:
+            strategies = [
+                self._strategy_gemini_selectors,
+                self._strategy_generic_selectors,
+                self._strategy_structured_extraction,
+                self._strategy_fallback
+            ]
+        else:
+            strategies = [
+                self._strategy_modern_selectors,
+                self._strategy_alternative_selectors,
+                self._strategy_generic_selectors,
+                self._strategy_structured_extraction,
+                self._strategy_fallback
+            ]
         
         for i, strategy in enumerate(strategies):
             try:
@@ -242,7 +253,8 @@ class ContentExtractor:
             '\n\n\n',
             '\n\nUser\n',
             '\n\nAssistant\n',
-            '\n\nChatGPT\n'
+            '\n\nChatGPT\n',
+            '\n\nGemini\n'
         ]
         
         segments = [page_text]
@@ -265,6 +277,45 @@ class ContentExtractor:
                 })
         
         return conversation[:20]  # Limit results
+
+    async def _strategy_gemini_selectors(self, page) -> List[Dict]:
+        """Gemini specific selectors strategy"""
+        conversation = []
+        
+        # Gemini structure often uses .share-turn-viewer for each exchange
+        turns = await page.query_selector_all('.share-turn-viewer')
+        
+        if not turns:
+            # Fallback to general message containers if turns not found
+            turns = await page.query_selector_all('div[class*="conversation-turn"]')
+            
+        for turn in turns:
+            # Extract user query
+            user_elem = await turn.query_selector('.user-query .query-text')
+            if user_elem:
+                user_content = await user_elem.inner_text()
+                if user_content:
+                    conversation.append({
+                        "role": "user",
+                        "content": user_content.strip(),
+                        "extraction_method": "gemini_selectors"
+                    })
+            
+            # Extract assistant response
+            assistant_elem = await turn.query_selector('.response-container .markdown')
+            if not assistant_elem:
+                assistant_elem = await turn.query_selector('.response-container')
+                
+            if assistant_elem:
+                assistant_content = await assistant_elem.inner_text()
+                if assistant_content:
+                    conversation.append({
+                        "role": "assistant",
+                        "content": assistant_content.strip(),
+                        "extraction_method": "gemini_selectors"
+                    })
+        
+        return conversation
     
     def _looks_like_message(self, text: str) -> bool:
         """Check if text looks like a conversation message"""

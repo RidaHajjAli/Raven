@@ -73,14 +73,20 @@ async def improved_validate_link(session: aiohttp.ClientSession, url: str) -> bo
     """Improved link validation with better error handling"""
     try:
         # Basic URL format validation
-        if not url.startswith("https://chatgpt.com/share/"):
+        is_chatgpt = url.startswith("https://chatgpt.com/share/")
+        is_gemini = url.startswith("https://gemini.google.com/share/")
+        
+        if not (is_chatgpt or is_gemini):
             logger.warning(f"Invalid URL format: {url}")
             return False
         
         # Extract UUID and validate format
         uuid_part = url.split('/')[-1]
-        if len(uuid_part) < 20:  # UUIDs should be longer
-            logger.warning(f"Invalid UUID format: {uuid_part}")
+        if is_chatgpt and len(uuid_part) < 20:  # ChatGPT UUIDs should be longer
+            logger.warning(f"Invalid ChatGPT UUID format: {uuid_part}")
+            return False
+        elif is_gemini and len(uuid_part) < 10:  # Gemini IDs can be shorter
+            logger.warning(f"Invalid Gemini ID format: {uuid_part}")
             return False
         
         # Try to access the link
@@ -133,10 +139,12 @@ async def improved_validate_link(session: aiohttp.ClientSession, url: str) -> bo
                 # Check for positive indicators that this is a valid conversation
                 positive_indicators = [
                     "chatgpt",
+                    "gemini",
                     "conversation",
                     "message",
                     "user:",
-                    "assistant:"
+                    "assistant:",
+                    "google"
                 ]
                 
                 positive_count = sum(1 for indicator in positive_indicators if indicator in content_lower)
@@ -305,12 +313,14 @@ async def background_worker():
         
         while app_state.is_running:
             try:
-                # Generate new links
-                links = link_generator.generate_links(count=20)  # Reduced batch size
+                # Generate new links for both platforms
+                chatgpt_links = link_generator.generate_links(count=10, platform="chatgpt")
+                gemini_links = link_generator.generate_links(count=10, platform="gemini")
+                links = chatgpt_links + gemini_links
                 
                 if links:
                     app_state.links_generated += len(links)
-                    logger.info(f"Generated {len(links)} new links")
+                    logger.info(f"Generated {len(links)} new links (10 ChatGPT, 10 Gemini)")
                     
                     # Process links with limited concurrency
                     semaphore = asyncio.Semaphore(3)  # Limit concurrent processing
