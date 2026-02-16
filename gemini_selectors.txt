@@ -1,0 +1,5 @@
+Gemini Selectors:
+- Title: .share-title-section h1
+- User Query: .user-query .query-text
+- Assistant Response: .response-container message-content .markdown
+- Conversation Turn: .share-turn-viewer
